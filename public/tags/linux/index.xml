@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Linux on RESYST-IT</title>
+    <link>http://localhost:1313/tags/linux/</link>
+    <description>Recent content in Linux on RESYST-IT</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 02 Mar 2016 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Netcat</title>
+      <link>http://localhost:1313/netcat/</link>
+      <pubDate>Wed, 02 Mar 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/netcat/</guid>
+      <description>
+
+&lt;p&gt;D&amp;rsquo;après la définition de wikipedia &amp;ldquo;netcat est un utilitaire permettant d&amp;rsquo;ouvrir des connexions réseau&amp;rdquo;. Il est aussi généralement appélé le couteau suisse réseau.
+Je me sert de netcat assez réguliérement dans mes missions de tous les jours. Occupant un poste d&amp;rsquo;admin sys/réseau et infogérant des plateformes clientes, j&amp;rsquo;ai réguliérement ce genre de demande :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Vous êtes sur que le port est ouvert sur le firewall je n&amp;rsquo;arrive pas à me connecter&lt;/li&gt;
+&lt;li&gt;J&amp;rsquo;ai fait un telnet et ça ne marche pas (Hey oui si tu ne sais pas utiliser telnet correctement ça ne marche pas)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Comme vous l&amp;rsquo;avez compris je fais essentiellement du scan de port avec netcat. Donc je vais vous décrire différentes façon d&amp;rsquo;utiliser netcat pour du scan de port. Je trouve netcat plus simple que nmap, la syntaxe de la commande se retient plus facilement. Après c&amp;rsquo;est une question de goût et d&amp;rsquo;habitude.
+On verra aussi comment transférer des fichiers avec netcat.&lt;/p&gt;
+
+&lt;h2 id=&#34;1-utilisation-simple-de-netcat:b7618e2ce6c0077967f747e2df966f24&#34;&gt;1. Utilisation simple de netcat&lt;/h2&gt;
+
+&lt;p&gt;Dans son approche basic, netcat permet d&amp;rsquo;ouvir une connexion réseau entre la machine et le serveur.&lt;br /&gt;
+Par exemple :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nc blog.resyst-it.fr 80
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cette commande permet d&amp;rsquo;ouvrir une connexion TCP sur le port 80. Maintenant, cette connexion réseau est ouverte. Vous pouvez éxecuter des commandes pour &amp;ldquo;discuter&amp;rdquo; avec le serveur par exemple. Mais ce sujet n&amp;rsquo;est pas dans notre scope.&lt;/p&gt;
+
+&lt;h2 id=&#34;2-netcat-pour-le-scan-de-port:b7618e2ce6c0077967f747e2df966f24&#34;&gt;2. Netcat pour le scan de port&lt;/h2&gt;
+
+&lt;p&gt;Voici un exemple pour le scan d&amp;rsquo;un port :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nc -zv blog.resyst-it.fr 80
+Connection to blog.resyst-it.fr 80 port [tcp/http] succeeded!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;On peut voir que le port 80 est ouvert.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nc -zv blog.resyst-it.fr 80
+nc: connect to blog.resyst-it.fr port 80 (tcp) failed: Connection refused
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Et dans ce cas là, le port est fermé.&lt;/p&gt;
+
+&lt;p&gt;L&amp;rsquo;option :&lt;br /&gt;
+-v : Permet d&amp;rsquo;activer le mode verbose&lt;br /&gt;
+-z : Spécifie à netcat qu&amp;rsquo;il doit juste faire un scan. Il ne gardera pas de session ouverte comme dans l&amp;rsquo;utilisation simple de netcat&lt;/p&gt;
+
+&lt;p&gt;Nous pouvons aussi désativer la résolution DNS :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nc -nvz blog.resyst-it.fr
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;L&amp;rsquo;option :&lt;br /&gt;
+-n : Permet de ne pas faire de résolution DNS&lt;/p&gt;
+
+&lt;p&gt;Donc si on le fait sur blog.resyst-it.fr ça ne fonctionnera pas.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nc -nzv blog.resyst-it.fr 80
+nc: getaddrinfo: Name or service not known
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Alors que sur l&amp;rsquo;IP, pas de problème :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nc -nvz 37.187.126.209 80   
+Connection to 37.187.126.209 80 port [tcp/*] succeeded!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;3-mode-client-serveur:b7618e2ce6c0077967f747e2df966f24&#34;&gt;3. Mode client/serveur&lt;/h2&gt;
+
+&lt;p&gt;Nous pouvons utiliser netcat en mode client/serveur et non pas simplement en mode client. Nous pouvons dire à netcat d&amp;rsquo;écouter sur un port pour vérifier que le firewall entre nos 2 serveurs ne bloque pas la communication.&lt;/p&gt;
+
+&lt;p&gt;Sur le serveur :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nc -vl 192.168.122.87 -p 1234
+listening on [any] 1234 ..
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Sur le client :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nc -nvz 192.168.122.87 1234
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Le résultat sur le client :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;(UNKNOWN) [192.168.122.87] 1234 (?) open
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;UNKNOWN car la machine ne peut pas mettre un nom sur le service ecoutant sur le port 1234&lt;br /&gt;
+Vu que le client fait juste un scan (option -z) la connexion est directement fermé.&lt;/p&gt;
+
+&lt;h2 id=&#34;4-netcat-pour-le-transfére-de-fichiers:b7618e2ce6c0077967f747e2df966f24&#34;&gt;4. Netcat pour le transfére de fichiers&lt;/h2&gt;
+
+&lt;p&gt;Netcat permet aussi de faire du transfère de fichier.&lt;/p&gt;
+
+&lt;p&gt;Pour un simple fichier texte sur la machine devant recevoir le fichier :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nc -l -p 1234 &amp;gt; test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Sur la machine qui envoie le fichier :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nc -q 0 192.168.122.87 1234 &amp;lt; myfile
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Mais ces commandes fonctionnent aussi avec une image ISO.&lt;/p&gt;
+
+&lt;p&gt;Sur la machine recevant l&amp;rsquo;image ISO :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nc -l -p 1234 &amp;gt; ubuntu.iso
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Sur la machine envoyant l&amp;rsquo;image ISO :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nc -q 0 192.168.122.87 1234 &amp;lt; ubuntu-15.10-desktop-amd64.iso
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Si on vérifie l&amp;rsquo;empreinte de l&amp;rsquo;image.&lt;/p&gt;
+
+&lt;p&gt;Sur la machine envoyant l&amp;rsquo;image ISO :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;md5sum ubuntu-15.10-desktop-amd64.iso 
+ece816e12f97018fa3d4974b5fd27337  ubuntu-15.10-desktop-amd64.iso
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Sur la machine recevant l&amp;rsquo;image ISO :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;md5sum ubuntu.iso
+ece816e12f97018fa3d4974b5fd27337  ubuntu.iso
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;On voit que tout s&amp;rsquo;est transféré correctement.&lt;/p&gt;
+
+&lt;p&gt;L&amp;rsquo;option :&lt;br /&gt;
+-q 0 (zéro) permet de couper la connxion dès que netcat détecte la fin du fichier a transférer.&lt;/p&gt;
+
+&lt;h2 id=&#34;5-conclusion:b7618e2ce6c0077967f747e2df966f24&#34;&gt;5. Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Je pense que vous avez la une bonne approche de netcat dans une utilisation régulière. Ce scope couvre presque 90% de l&amp;rsquo;utilisation netcat en entreprise pour un sysadmin.
+Je vous laisse faire des tests et nous faire un retour concernant son utilisation ;)&lt;/p&gt;
+
+&lt;p&gt;Pour rappel :&lt;br /&gt;
+nc -nvz IP PORT -&amp;gt; pour le scan d&amp;rsquo;un port sur une IP&lt;br /&gt;
+nc -vz NOM PORT -&amp;gt; pour le scan d&amp;rsquo;un port sur une URL&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,31 @@
+.post-category-linux{
+    background: #268bd2 none repeat scroll 0% 0%;
+}
+
+.post-category-supervision{
+    background: #859900;
+}
+
+.post-category-openstack{
+    background: #dc322f;
+}
+
+.post-category-reseaux{
+    background: #b58900;
+}
+
+.post-category-virtualisation{
+    background: #d33682;
+}
+
+.post-category-VMware{
+    background: #6c71c4;
+}
+
+.post-category-git{
+    background: #cb4b16;
+}
+
+.post-category-docker{
+    background: #eee8d5;
+}

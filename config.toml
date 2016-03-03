@@ -1,0 +1,24 @@
+baseurl = "http://blog.resyst-it.fr/"
+languageCode = "en-us"
+title = "RESYST-IT"
+disqusShortname = "resyst-it"
+
+[params]
+    sidebartitle = "RESYST-IT"
+    sidebartagline = "Blog sur l'infrastructure IT"
+    categoriescss = "/css/my-categories.css"
+
+
+#[[menu.main]]
+#   name = "About"
+#   url = "/contact"
+
+#[[menu.social]]
+#    pre = "<i class='fa fa-twitter'></i>"
+#    url = "'https://twitter.com/share' class='twitter-share-button' data-url='http://blog.resyst-it.fr' data-text='Un blog sur l'infrastructure IT'"
+#    identifier = "twitter"
+
+#    [[menu.footer]]
+#    name = "CC BY-SA"
+#    url = "https://creativecommons.org/licenses/by-sa/3.0/"
+
